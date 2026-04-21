@@ -212,6 +212,19 @@ If every model exports the same five functions, the next one should too. If ever
 
 > **This section documents current preferences and will change over time.** The principles above are durable; the specific tools below are not. When a tool listed here no longer fits, swap it out -- the architecture should be tool-agnostic enough that switching is a configuration change, not a rewrite.
 
+### The Stack Is Not Static
+
+Our preferences reflect what works well for us today. The ecosystem moves, and a tool that was the right choice two years ago may be outclassed by something with better ergonomics, performance, bundle size, or community momentum today. Staying current is part of the job.
+
+**Before making a non-trivial tech stack decision** -- picking a framework for a new project, choosing between two libraries for a core concern, committing to a pattern that will be hard to reverse -- take a fresh look at the landscape:
+
+- **Scan the current conversation.** What are working engineers actually reaching for right now? Check release notes, migration guides, benchmark posts, and community discussion (Hacker News, Reddit, conference talks, well-regarded engineering blogs). Pay attention to what's gaining traction and what's quietly being abandoned.
+- **Revisit our current preference.** Is the library listed below still actively maintained? Has its maintainer situation changed? Are users migrating away from it? A preference documented here is a default, not a mandate.
+- **Consider emerging options seriously.** Newer tools that have earned strong adoption, solve real pain points, or meaningfully improve on incumbents deserve a look. Use the dependency evaluation criteria below -- don't adopt for novelty, but don't dismiss for it either.
+- **Weigh switching cost honestly.** Changing the component library in one new project is cheap; changing it across a mature codebase is not. The bar for switching rises with blast radius.
+
+**When you find something worth considering, surface it.** Bring it up in review, pilot it on a low-stakes project, and -- if it earns its place -- propose an update to this document. The guidelines improve when the team feeds findings back in. A new preference, a newly acceptable alternative, or a previously-preferred tool moving to the "avoid" list are all valid updates.
+
 ### How We Evaluate Dependencies
 
 Every third-party library is a bet that someone else will maintain code you depend on. Evaluate that bet honestly:
@@ -362,6 +375,7 @@ When given a plan to implement, execute steps in the specified order. Do not ski
 - Is it actively maintained? Check last commit, issue responsiveness, release cadence.
 - Does it have meaningful community adoption? Stars alone don't matter, but usage and contributor count signal longevity.
 - How hard would it be to replace if the project dies? The deeper the integration, the higher the bar for adoption.
+- Is the landscape telling us something? If the guidelines list a preferred option for this concern, is it still the right default, or has the community moved on? Surface findings rather than silently drifting.
 
 ### Before Creating a New File
 
@@ -416,3 +430,4 @@ Test the feature, not just the code. Type checking and test suites verify correc
 - [ ] Separation of concerns respected -- layers aren't crossing boundaries
 - [ ] UI tested in browser, not just type-checked
 - [ ] `CLAUDE.md` updated if architecture or conventions changed
+- [ ] If the change introduces a new library or swaps a preferred one, the decision is justified against the current landscape and -- if broadly applicable -- these guidelines are updated
