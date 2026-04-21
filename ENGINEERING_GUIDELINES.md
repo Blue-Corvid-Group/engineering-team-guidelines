@@ -354,6 +354,32 @@ When given a plan to implement, execute steps in the specified order. Do not ski
 - Setup steps come FIRST, before any code changes
 - If a step seems unnecessary, flag it and ask before skipping
 
+### Subagents and Agent Teams
+
+Claude Code supports two parallelism primitives. Pick the right one, then match model capability to task complexity.
+
+**Subagents** run within a single session. The main agent spawns them via the Agent tool, they work in their own context window, and they report results back to the main agent. They never talk to each other. Good for focused tasks where only the result matters.
+
+**Agent teams** ([docs](https://code.claude.com/docs/en/agent-teams)) are multiple full Claude Code instances coordinated through a shared task list and a direct messaging system. Teammates can message each other, challenge findings, and self-claim tasks. Good for research, review, debugging with competing hypotheses, and cross-layer work where the teammates need to communicate. Agent teams are experimental and must be enabled via `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in settings.json. Claude can propose a team autonomously when a task would benefit from parallel exploration, or you can ask for one in natural language ("Create an agent team to review PR #142 with a security teammate, a performance teammate, and a test coverage teammate").
+
+**Decompose before executing.** When a task has two or more independent subtasks, spawn parallel workers rather than running them serially. Default to more parallelism, not less. Serial only when subtask B needs subtask A's output.
+
+**Pick the model at invocation time** via the `model` parameter on the Agent tool (for subagents) or when spawning teammates ("Use Sonnet for each teammate"). Don't inherit silently.
+
+- **Haiku**: mechanical only, no reasoning required. Running tests, listing dependencies, fetching known file contents, file existence checks, simple grep-level research. Rare.
+- **Sonnet**: default tier for research, exploration, summarization, small-change code review, prose writing.
+- **Opus**: architecture decisions, complex multi-file refactoring, nuanced debugging, security review, cases where correctness outweighs speed.
+
+**Background mode** via `run_in_background: true` lets the main agent keep working while long-running subagents execute. Good for deep exploration or test suites likely to take more than sixty seconds.
+
+**Examples**
+
+- "How does auth work in this app?" uses a single `Explore` subagent on Sonnet. No decomposition needed.
+- "Review this PR" spawns three parallel subagents: `code-reviewer` on Sonnet, `test-runner` on Haiku, `deps-auditor` on Haiku. Main agent synthesizes findings.
+- "Investigate why the app disconnects after one message" benefits from an agent team: five teammates each test a different hypothesis and challenge each other's theories before converging.
+- "Refactor the authentication module across frontend, backend, and tests" benefits from an agent team with a teammate per layer, coordinating through the shared task list.
+- "Design the user approvals feature" calls `feature-dev:code-architect` on Opus, serial. Not a parallel task.
+
 ---
 
 ## Decision Frameworks
