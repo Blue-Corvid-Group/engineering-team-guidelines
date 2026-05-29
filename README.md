@@ -2,76 +2,68 @@
 
 How we build software: our principles, patterns, and standards for working with agentic coding tools and each other.
 
-This repo doubles as a Claude Code **skill**. The content is split across small files so a coding session loads only the part a task needs, instead of reading one large document every time.
+This repo is a Claude Code **plugin** that bundles the `engineering-guidelines` skill. The skill is split across small files so a coding session loads only the part a task needs, instead of reading one large document every time. Claude consults it automatically when it detects engineering work (per the skill's description); no per-session token cost when you're not coding.
 
 | File | What's in it | When it's read |
 |------|--------------|----------------|
-| [`SKILL.md`](SKILL.md) | Thin router. The only part always in context. | Always (skill entry point) |
-| [`principles.md`](principles.md) | Durable engineering principles, separation of concerns, layered architecture, working with AI agents, security, decision frameworks, checklists. | Any real code work |
-| [`stack.md`](stack.md) | Preferred languages and frontend/backend/data/AI/deployment tools, described as *roles* rather than fixed versions. Volatile by design. | Only when making a tech-stack or architecture decision (triggers a fresh landscape check) |
-| [`testing.md`](testing.md) | Testing philosophy, what to test vs. not, enforced coverage, periodic test review, smoke testing. | When writing/changing tests or finishing a feature |
+| [`skills/engineering-guidelines/SKILL.md`](skills/engineering-guidelines/SKILL.md) | Thin router. The only part always in context when the skill is active. | Skill entry point |
+| [`principles.md`](skills/engineering-guidelines/principles.md) | Durable engineering principles, separation of concerns, layered architecture, working with AI agents, security, decision frameworks, checklists. | Any real code work |
+| [`stack.md`](skills/engineering-guidelines/stack.md) | Preferred languages and frontend/backend/data/AI/deployment tools, described as *roles* rather than fixed versions. Volatile by design. | Only when making a tech-stack or architecture decision (triggers a fresh landscape check) |
+| [`testing.md`](skills/engineering-guidelines/testing.md) | Testing philosophy, what to test vs. not, enforced coverage, periodic test review, smoke testing. | When writing/changing tests or finishing a feature |
 
 ---
 
-## Setup (one time per machine)
+## Install (one time per machine)
 
-The repo is the single source of truth. You install it once by symlinking it into your Claude Code skills directory and adding a short pointer to your global `CLAUDE.md`. Two steps.
+Install it as a plugin from this repo's marketplace. No clone required, and updates propagate without re-installing.
 
-### 1. Clone and symlink the skill
-
-Clone anywhere you keep repos. The symlink uses the clone's actual location, so the path doesn't matter:
-
-```bash
-git clone https://github.com/Blue-Corvid-Group/engineering-team-guidelines.git
-cd engineering-team-guidelines
-ln -s "$(pwd)" ~/.claude/skills/engineering-guidelines
+```
+/plugin marketplace add Blue-Corvid-Group/engineering-team-guidelines
+/plugin install engineering-guidelines@blue-corvid-group
+/reload-plugins
 ```
 
-The symlink (rather than a copy) means `git pull` in this repo instantly updates the skill, no re-installing.
+That's it. The skill auto-surfaces when Claude detects code work, because its description says to consult it before writing, reviewing, or architecting code. You do **not** need to edit your global `CLAUDE.md`.
 
-> On a machine where `~/.claude/skills/` doesn't exist yet, create it first: `mkdir -p ~/.claude/skills`.
+### Auto-update (recommended)
 
-### 2. Tell your global config to use it
+To get stack and guideline changes automatically at session start, add this to your `~/.claude/settings.json`:
 
-A symlinked skill is dormant until something invokes it. Add this to your `~/.claude/CLAUDE.md` so engineering work consults it automatically:
-
-```markdown
-## Engineering work, read the team guidelines
-
-Before writing, modifying, reviewing, refactoring, or architecting code,
-consult the `engineering-guidelines` skill. It's split for token efficiency;
-read only the part the task needs:
-
-- principles.md — durable principles, architecture, security, decision
-  frameworks. Read once per session the first time engineering work starts.
-- stack.md — preferred tools. Read ONLY when making a tech-stack or
-  architecture decision (it triggers a fresh landscape check, which is
-  token-expensive, so skip it for routine work).
-- testing.md — testing standards and smoke testing. Read when writing or
-  changing tests, or finishing a feature.
+```json
+{
+  "extraKnownMarketplaces": {
+    "blue-corvid-group": {
+      "source": { "source": "github", "repo": "Blue-Corvid-Group/engineering-team-guidelines" },
+      "autoUpdate": true
+    }
+  }
+}
 ```
 
-Prefer not to edit your global config? You can instead invoke it explicitly in any session (`/engineering-guidelines`, or just ask Claude to consult the engineering guidelines). The auto-trigger above is the recommended path because it doesn't rely on remembering.
+With `autoUpdate` on, Claude Code refreshes the plugin at startup, so a merged change to `stack.md` reaches you on your next session. Without it, pull updates manually:
 
-### 3. Verify
-
-Start a Claude Code session and confirm the skill is registered:
-
-```bash
-ls -l ~/.claude/skills/engineering-guidelines   # should show the symlink → your clone
+```
+/plugin marketplace update blue-corvid-group
+/reload-plugins
 ```
 
-In a session, ask Claude to "consult the engineering guidelines" and confirm it reads `principles.md`. You're set.
+### Verify
 
-### Staying current
+```
+/plugin
+```
 
-`git pull` in your clone whenever you want the latest. Because it's symlinked, there's nothing else to do.
+`engineering-guidelines` should appear as installed. Ask Claude to "consult the engineering guidelines" in a session and confirm it reads `principles.md`.
+
+### Stronger triggering (optional)
+
+The skill description handles triggering for most work. If you want a harder guarantee on a specific project, add a line to that project's `CLAUDE.md`: *"Consult the `engineering-guidelines` skill before code work."* The skill content still loads only on demand, so this stays token-cheap.
 
 ---
 
 ## Contributing
 
-These guidelines improve when the team feeds findings back in. Open a PR.
+These guidelines improve when the team feeds findings back in. Open a PR. Bump `version` in `.claude-plugin/plugin.json` when you want the change to ship as a new version to teammates with auto-update on.
 
 ### The stack evolves continuously
 
@@ -87,3 +79,20 @@ Before adding anything, ask: **is this ours, or is it the harness's?**
 - Don't add: descriptions of harness mechanics, tool/flag names, model names, prices, or dated feature claims. Point at the harness's current guidance instead of freezing a snapshot.
 
 When a preference also lives in a personal global `CLAUDE.md` (like secrets handling), keep one source of truth and have the other *point* at it rather than copying it.
+
+---
+
+## Repository layout
+
+```
+.claude-plugin/
+  plugin.json         # plugin manifest
+  marketplace.json    # marketplace catalog (lets teammates add this repo directly)
+skills/
+  engineering-guidelines/
+    SKILL.md          # router
+    principles.md
+    stack.md
+    testing.md
+README.md
+```
