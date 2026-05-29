@@ -1,0 +1,9 @@
+{
+  "name": "engineering-guidelines",
+  "description": "Blue Corvid Group engineering standards: principles, architecture, preferred stack, testing. Bundles the engineering-guidelines skill, which Claude consults before writing, reviewing, or architecting code.",
+  "version": "1.0.0",
+  "author": { "name": "Blue Corvid Group" },
+  "homepage": "https://github.com/Blue-Corvid-Group/engineering-team-guidelines",
+  "repository": "https://github.com/Blue-Corvid-Group/engineering-team-guidelines",
+  "license": "UNLICENSED"
+}

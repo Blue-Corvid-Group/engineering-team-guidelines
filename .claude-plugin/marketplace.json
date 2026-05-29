@@ -1,0 +1,11 @@
+{
+  "name": "blue-corvid-group",
+  "owner": { "name": "Blue Corvid Group" },
+  "plugins": [
+    {
+      "id": "engineering-guidelines",
+      "source": { "type": "directory", "path": "." },
+      "description": "Blue Corvid Group engineering standards as a skill: principles, architecture, preferred stack, testing. Claude consults it before code work."
+    }
+  ]
+}

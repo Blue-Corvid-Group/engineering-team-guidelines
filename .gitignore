@@ -1,0 +1,18 @@
+# Local Claude Code settings (machine-specific, may hold local values)
+.claude/settings.local.json
+
+# Environment / secrets (none expected in this repo, but never commit them)
+.env
+.env.*
+!.env.example
+.envrc
+*credentials*
+*secrets*
+*token*
+*-key.json
+*-key.pem
+*.pfx
+*.p12
+
+# OS / editor cruft
+.DS_Store
